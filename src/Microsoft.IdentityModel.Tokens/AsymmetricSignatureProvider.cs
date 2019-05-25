@@ -142,6 +142,9 @@ namespace Microsoft.IdentityModel.Tokens
             if (!_cryptoProviderFactory.IsSupportedAlgorithm(algorithm, key))
                 throw LogHelper.LogExceptionMessage(new NotSupportedException(LogHelper.FormatInvariant(LogMessages.IDX10634, (algorithm ?? "null"), key)));
 
+            if (key is JsonWebKey jsonWebKey)
+                JsonWebKeyConverter.TryConvertToSecurityKey(jsonWebKey, out SecurityKey _);
+
             ValidateAsymmetricSecurityKeySize(key, algorithm, willCreateSignatures);
             _asymmetricAdapter = ResolveAsymmetricAdapter(key, algorithm, willCreateSignatures);
             WillCreateSignatures = willCreateSignatures;
@@ -330,14 +333,20 @@ namespace Microsoft.IdentityModel.Tokens
             if (string.IsNullOrEmpty(algorithm))
                 throw LogHelper.LogArgumentNullException(nameof(algorithm));
 
+            int keySize;
+            if (key is JsonWebKey jsonWebKey && jsonWebKey.ConvertedKey != null)
+                keySize = jsonWebKey.ConvertedKey.KeySize;
+            else
+                keySize = key.KeySize;
+
             if (willCreateSignatures)
             {
                 if (MinimumAsymmetricKeySizeInBitsForSigningMap.ContainsKey(algorithm)
-                && key.KeySize < MinimumAsymmetricKeySizeInBitsForSigningMap[algorithm])
+                && keySize < MinimumAsymmetricKeySizeInBitsForSigningMap[algorithm])
                     throw LogHelper.LogExceptionMessage(new ArgumentOutOfRangeException("key.KeySize", LogHelper.FormatInvariant(LogMessages.IDX10630, key, MinimumAsymmetricKeySizeInBitsForSigningMap[algorithm], key.KeySize)));
             }
             else if (MinimumAsymmetricKeySizeInBitsForVerifyingMap.ContainsKey(algorithm)
-                 && key.KeySize < MinimumAsymmetricKeySizeInBitsForVerifyingMap[algorithm])
+                 && keySize < MinimumAsymmetricKeySizeInBitsForVerifyingMap[algorithm])
             {
                 throw LogHelper.LogExceptionMessage(new ArgumentOutOfRangeException("key.KeySize", LogHelper.FormatInvariant(LogMessages.IDX10631, key, MinimumAsymmetricKeySizeInBitsForVerifyingMap[algorithm], key.KeySize)));
             }

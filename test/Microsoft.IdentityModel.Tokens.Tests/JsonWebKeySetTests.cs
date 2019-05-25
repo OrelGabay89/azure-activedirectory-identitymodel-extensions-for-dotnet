@@ -197,9 +197,6 @@ namespace Microsoft.IdentityModel.Tokens.Tests
             var context = TestUtilities.WriteHeader($"{this}.GetSigningKeys", theoryData);
             try
             {
-                if (theoryData.SetEcdsaAdapterToNull)
-                    JsonWebKeySet.ECDsaAdapter = null;
-
                 var signingKeys = theoryData.JsonWebKeySet.GetSigningKeys();
 
                 IdentityComparer.AreEqual(signingKeys, theoryData.ExpectedSigningKeys, context);
@@ -209,19 +206,6 @@ namespace Microsoft.IdentityModel.Tokens.Tests
             catch (Exception ex)
             {
                 theoryData.ExpectedException.ProcessException(ex, context);
-            }
-
-            // revert to default
-            if (theoryData.SetEcdsaAdapterToNull)
-            {
-                try
-                {
-                    JsonWebKeySet.ECDsaAdapter = new ECDsaAdapter();
-                }
-                catch
-                {
-                    // ECDsaAdapter is not supported by NETSTANDARD1.4, when running on platforms other than Windows
-                }
             }
 
             TestUtilities.AssertFailIfErrors(context);
@@ -383,8 +367,7 @@ namespace Microsoft.IdentityModel.Tokens.Tests
                 theoryData.Add(new JsonWebKeySetTheoryData
                 {
                     JsonWebKeySet = jsonWebKeySet,
-                    ExpectedSigningKeys = new List<SecurityKey>(),
-                    SetEcdsaAdapterToNull = true,
+                    ExpectedSigningKeys = new List<SecurityKey>() { (jsonWebKeySet.Keys as List<JsonWebKey>)[1] },
                     TestId = "ECDsaAdapterIsNotSupportedSkipUnresolved",
                 });
 
@@ -393,7 +376,6 @@ namespace Microsoft.IdentityModel.Tokens.Tests
                 {
                     JsonWebKeySet = jsonWebKeySet,
                     ExpectedSigningKeys = new List<SecurityKey>() { (jsonWebKeySet.Keys as List<JsonWebKey>)[0], (jsonWebKeySet.Keys as List<JsonWebKey>)[1] },
-                    SetEcdsaAdapterToNull = true,
                     TestId = "ECDsaAdapterIsNotSupported",
                 });
 
@@ -442,8 +424,6 @@ namespace Microsoft.IdentityModel.Tokens.Tests
             public JsonWebKeySet JsonWebKeySet { get; set; }
 
             public List<SecurityKey> ExpectedSigningKeys { get; set; }
-
-            public bool SetEcdsaAdapterToNull { get; set; } = false;
          }
     }
 }

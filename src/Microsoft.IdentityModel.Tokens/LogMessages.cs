@@ -192,21 +192,25 @@ namespace Microsoft.IdentityModel.Tokens
         public const string IDX10693 = "IDX10693: RSACryptoServiceProvider doesn't support the RSASSA-PSS signature algorithm. The list of supported algorithms is available here: https://aka.ms/IdentityModel/supported-algorithms";
 
         // security keys
-        public const string IDX10700 = "IDX10700: Invalid RsaParameters: '{0}'. Both modulus and exponent should be present";
+        public const string IDX10700 = "IDX10700: Invalid RsaParameters: '{0}'. Modulus is null";
         public const string IDX10701 = "IDX10701: Invalid JsonWebKey rsa keying material: '{0}'. Both modulus and exponent should be present";
         public const string IDX10702 = "IDX10702: One or more private RSA key parts are null in the JsonWebKey: '{0}'";
         public const string IDX10703 = "IDX10703: Cannot create symmetric security key. Key length is zero.";
+        public const string IDX10704 = "IDX10704: Invalid RsaParameters: '{0}'. Exponent is null";
+        public const string IDX10705 = "IDX10705: Exception thrown when converting this JsonWebKey '{0}'. Exception: '{1}'.";
 
         // Json specific errors
-        public const string IDX10801 = "IDX10801: Unable to create an RSA public key from the Exponent and Modulus found in the JsonWebKey: E: '{0}', N: '{1}'. Inner exception: '{2}'.";
-        public const string IDX10802 = "IDX10802: Unable to create an X509Certificate2 from the X509Data: '{0}'. Inner exception '{1}'.";
+        public const string IDX10801 = "IDX10801: Unable to create a RSA public key from the Exponent and Modulus found in the JsonWebKey: E: '{0}', N: '{1}', Key: '{2}'. Exception: '{3}'.";
+        public const string IDX10802 = "IDX10802: Unable to create a X509Certificate2 from the X509Data: '{0}'. Exception '{1}'.";
         public const string IDX10804 = "IDX10804: Unable to retrieve document from: '{0}'.";
         public const string IDX10805 = "IDX10805: Error deserializing json: '{0}' into '{1}'.";
         public const string IDX10806 = "IDX10806: Deserializing json: '{0}' into '{1}'.";
-        public const string IDX10807 = "IDX10807: Unable to create an ECDsa from the parameters found in the JsonWebKey. Inner exception: '{0}'.";
+        public const string IDX10807 = "IDX10807: Unable to create an ECDsa from the parameters found in the JsonWebKey: '{0}'. Exception: '{1}'.";
         public const string IDX10808 = "IDX10808: The 'use' parameter of a JsonWebKey with a 'kid': '{0}' should be 'sig' or empty, but was '{1}'.";
-        public const string IDX10809 = "IDX10809: The 'kty' parameter '{0}' is not supported. Supported 'kty' parameters are 'RSA' and 'EC'.";
-        public const string IDX10810 = "IDX10810: JsonWebKey with a 'kid': '{0}' was not resolved into an X509SecurityKey or into an RsaSecurityKey.";
+        public const string IDX10809 = "IDX10809: Unable to create a SecurityKey from the JsonWebKey with 'kty' == '{0}'. Supported 'kty' types are: 'RSA' and 'EC'.";
+        public const string IDX10810 = "IDX10810: JsonWebKey with a 'kid': '{0}' with 'kty' == '{1}', was not resolved into an X509SecurityKey, RsaSecurityKey or ECDSASecurityKey.";
+        public const string IDX10811 = "IDX10811: The 'kty' parameter of a JsonWebKey with a 'kid': '{0}' is null or empty.";
+
 #pragma warning restore 1591
     }
 }

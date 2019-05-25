@@ -37,6 +37,20 @@ namespace Microsoft.IdentityModel.Tokens
     {
         private CryptoProviderFactory _cryptoProviderFactory = new CryptoProviderFactory(CryptoProviderFactory.Default);
 
+        internal SecurityKey(SecurityKey key)
+        {
+            _cryptoProviderFactory = key._cryptoProviderFactory;
+            KeyId = key.KeyId;
+        }
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public SecurityKey()
+        {
+
+        }
+
         /// <summary>
         /// This must be overridden to get the size of this <see cref="SecurityKey"/>.
         /// </summary>

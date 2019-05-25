@@ -85,6 +85,8 @@ namespace Microsoft.IdentityModel.Tokens
             }
         }
 
+        internal SecurityKey ConvertedKey { get; set; }
+
         /// <summary>
         /// When deserializing from JSON any properties that are not defined will be placed here.
         /// </summary>
@@ -256,6 +258,7 @@ namespace Microsoft.IdentityModel.Tokens
             get
             {
                 if (Kty == JsonWebAlgorithmsKeyTypes.RSA && !string.IsNullOrEmpty(N))
+                // we need to consider x5c keys.
                     return Base64UrlEncoder.DecodeBytes(N).Length * 8;
                 else if (Kty == JsonWebAlgorithmsKeyTypes.EllipticCurve && !string.IsNullOrEmpty(X))
                     return Base64UrlEncoder.DecodeBytes(X).Length * 8;
@@ -306,33 +309,23 @@ namespace Microsoft.IdentityModel.Tokens
 
         internal RSAParameters CreateRsaParameters()
         {
-            if (N == null || E == null)
+            if (string.IsNullOrEmpty(N))
                 throw LogHelper.LogExceptionMessage(new ArgumentException(LogHelper.FormatInvariant(LogMessages.IDX10700, this)));
 
-            RSAParameters parameters = new RSAParameters();
+            if(string.IsNullOrEmpty(E))
+                throw LogHelper.LogExceptionMessage(new ArgumentException(LogHelper.FormatInvariant(LogMessages.IDX10704, this)));
 
-            if (D != null)
-                parameters.D = Base64UrlEncoder.DecodeBytes(D);
-
-            if (DP != null)
-                parameters.DP = Base64UrlEncoder.DecodeBytes(DP);
-
-            if (DQ != null)
-                parameters.DQ = Base64UrlEncoder.DecodeBytes(DQ);
-
-            if (QI != null)
-                parameters.InverseQ = Base64UrlEncoder.DecodeBytes(QI);
-
-            if (P != null)
-                parameters.P = Base64UrlEncoder.DecodeBytes(P);
-
-            if (Q != null)
-                parameters.Q = Base64UrlEncoder.DecodeBytes(Q);
-
-            parameters.Exponent = Base64UrlEncoder.DecodeBytes(E);
-            parameters.Modulus = Base64UrlEncoder.DecodeBytes(N);
-
-            return parameters;
+            return new RSAParameters
+            {
+                Modulus = Base64UrlEncoder.DecodeBytes(N),
+                Exponent = Base64UrlEncoder.DecodeBytes(E),
+                D = string.IsNullOrEmpty(D) ? null : Base64UrlEncoder.DecodeBytes(D),
+                P = string.IsNullOrEmpty(P) ? null : Base64UrlEncoder.DecodeBytes(P),
+                Q = string.IsNullOrEmpty(Q) ? null : Base64UrlEncoder.DecodeBytes(Q),
+                DP = string.IsNullOrEmpty(DP) ? null : Base64UrlEncoder.DecodeBytes(DP),
+                DQ = string.IsNullOrEmpty(DQ) ? null : Base64UrlEncoder.DecodeBytes(DQ),
+                InverseQ = string.IsNullOrEmpty(QI) ? null : Base64UrlEncoder.DecodeBytes(QI)
+            };
         }
     }
 }

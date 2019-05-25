@@ -50,15 +50,18 @@ namespace Microsoft.IdentityModel.Tokens
             if (key is X509SecurityKey x509Key)
             {
                 // only RSA keys are supported
+                // We should be accounting for newer algorithms GetRSAPublicKey()
                 if (x509Key.PublicKey as RSA == null)
                     return false;
 
                 return IsSupportedRsaAlgorithm(algorithm, key);
             }
 
+            // [brentsch] TODO - Kty can be null.
             if (key is JsonWebKey jsonWebKey)
             {
                 if (jsonWebKey.Kty == JsonWebAlgorithmsKeyTypes.RSA)
+                    // what about x5c?
                     return IsSupportedRsaAlgorithm(algorithm, key);
                 else if (jsonWebKey.Kty == JsonWebAlgorithmsKeyTypes.EllipticCurve)
                     return IsSupportedEcdsaAlgorithm(algorithm);

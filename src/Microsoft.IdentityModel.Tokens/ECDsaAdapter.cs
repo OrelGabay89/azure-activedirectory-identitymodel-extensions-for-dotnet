@@ -40,7 +40,15 @@ namespace Microsoft.IdentityModel.Tokens
     /// </summary>
     internal class ECDsaAdapter
     {
-        private readonly CreateECDsaDelegate CreateECDsaFunction;
+        internal readonly CreateECDsaDelegate CreateECDsaFunction = null;
+        internal static ECDsaAdapter Instance;
+
+        static ECDsaAdapter()
+        {
+            Instance = new ECDsaAdapter();
+        }
+
+        internal bool CanCreateECDsa => CreateECDsaFunction != null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ECDsaAdapter"/> class.
@@ -59,8 +67,6 @@ namespace Microsoft.IdentityModel.Tokens
 #elif NETSTANDARD1_4
             if (SupportsCNGKey())
                 CreateECDsaFunction = CreateECDsaUsingCNGKey;
-            else
-                throw LogHelper.LogExceptionMessage(new PlatformNotSupportedException(LogMessages.IDX10690));
 #elif DESKTOP
             CreateECDsaFunction = CreateECDsaUsingCNGKey;
 #endif
@@ -313,13 +319,13 @@ namespace Microsoft.IdentityModel.Tokens
             if (jsonWebKey == null)
                 throw LogHelper.LogArgumentNullException(nameof(jsonWebKey));
 
-            if (jsonWebKey.Crv == null)
+            if (string.IsNullOrEmpty(jsonWebKey.Crv))
                 throw LogHelper.LogArgumentNullException(nameof(jsonWebKey.Crv));
 
-            if (jsonWebKey.X == null)
+            if (string.IsNullOrEmpty(jsonWebKey.X))
                 throw LogHelper.LogArgumentNullException(nameof(jsonWebKey.X));
 
-            if (jsonWebKey.Y == null)
+            if (string.IsNullOrEmpty(jsonWebKey.Y))
                 throw LogHelper.LogArgumentNullException(nameof(jsonWebKey.Y));
 
             try
@@ -332,7 +338,7 @@ namespace Microsoft.IdentityModel.Tokens
 
                 if (usePrivateKey)
                 {
-                    if (jsonWebKey.D == null)
+                    if (string.IsNullOrEmpty(jsonWebKey.D))
                         throw LogHelper.LogArgumentNullException(nameof(jsonWebKey.D));
 
                     ecParams.D = Base64UrlEncoder.DecodeBytes(jsonWebKey.D);

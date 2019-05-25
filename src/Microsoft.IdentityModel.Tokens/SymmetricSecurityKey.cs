@@ -38,6 +38,14 @@ namespace Microsoft.IdentityModel.Tokens
         int _keySize;
         byte[] _key;
 
+        internal SymmetricSecurityKey(JsonWebKey webKey)
+            : base(webKey)
+        {
+            _key = Base64UrlEncoder.DecodeBytes(webKey.K);
+            _keySize = _key.Length * 8;
+            webKey.ConvertedKey = this;
+        }
+
         /// <summary>
         /// Returns a new instance of <see cref="SymmetricSecurityKey"/> instance.
         /// </summary>

@@ -42,11 +42,23 @@ namespace Microsoft.IdentityModel.Tokens
 
         private PrivateKeyStatus _foundPrivateKey;
 
+        internal RsaSecurityKey(JsonWebKey webKey)
+            : base(webKey)
+        {
+            IntializeWithRsaParameters(webKey.CreateRsaParameters());
+            webKey.ConvertedKey = this;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RsaSecurityKey"/> class.
         /// </summary>
         /// <param name="rsaParameters"><see cref="RSAParameters"/></param>
         public RsaSecurityKey(RSAParameters rsaParameters)
+        {
+            IntializeWithRsaParameters(rsaParameters);
+        }
+
+        internal void IntializeWithRsaParameters(RSAParameters rsaParameters)
         {
             // must have modulus and exponent otherwise the crypto operations fail later
             if (rsaParameters.Modulus == null || rsaParameters.Exponent == null)
@@ -55,7 +67,13 @@ namespace Microsoft.IdentityModel.Tokens
             _hasPrivateKey = rsaParameters.D != null && rsaParameters.DP != null && rsaParameters.DQ != null && rsaParameters.P != null && rsaParameters.Q != null && rsaParameters.InverseQ != null;
             _foundPrivateKey = _hasPrivateKey.Value ? PrivateKeyStatus.Exists : PrivateKeyStatus.DoesNotExist;
             _foundPrivateKeyDetermined = true;
+
+#if NET461 || NETSTANDARD1_4 || NETSTANDARD2_0
+            Rsa = RSA.Create();
+            Rsa.ImportParameters(rsaParameters);
+#else
             Parameters = rsaParameters;
+#endif
         }
 
         /// <summary>
