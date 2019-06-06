@@ -25,6 +25,7 @@
 //
 //------------------------------------------------------------------------------
 
+using System;
 using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
 
@@ -35,7 +36,7 @@ namespace Microsoft.IdentityModel.Tokens
     /// </summary>
     public abstract class SecurityKey
     {
-        private CryptoProviderFactory _cryptoProviderFactory = new CryptoProviderFactory(CryptoProviderFactory.Default);
+        private CryptoProviderFactory _cryptoProviderFactory = CryptoProviderFactory.Default;
 
         /// <summary>
         /// This must be overridden to get the size of this <see cref="SecurityKey"/>.
@@ -47,6 +48,9 @@ namespace Microsoft.IdentityModel.Tokens
         /// </summary>
         [JsonIgnore]
         public virtual string KeyId { get; set; }
+
+        [JsonIgnore]
+        internal string InternalId { get; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Gets or sets <see cref="Microsoft.IdentityModel.Tokens.CryptoProviderFactory"/>.
@@ -60,13 +64,17 @@ namespace Microsoft.IdentityModel.Tokens
             }
             set
             {
-                if (value == null)
-                {
-                    throw LogHelper.LogArgumentNullException("value");
-                };
-
-                _cryptoProviderFactory = value;
+                _cryptoProviderFactory = value ?? throw LogHelper.LogArgumentNullException("value");
             }
+        }
+
+        /// <summary>
+        /// returns formatted value.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{GetType().ToString()}, 'KeyId' : {KeyId}, 'InternalId' : {InternalId}";
         }
     }
 }

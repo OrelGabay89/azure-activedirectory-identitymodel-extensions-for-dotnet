@@ -71,6 +71,7 @@ ipch/
 *.psess
 *.vsp
 *.vspx
+*.vs
 
 # TFS 2012 Local Workspace
 $tf/
@@ -210,3 +211,4 @@ backup/*
 /.vs/
 test/ApiChangeTest/Resource/devAssemblies
 test/ApiChangeTest/Resource/reports
+test/Runtime/Perf/packages/*

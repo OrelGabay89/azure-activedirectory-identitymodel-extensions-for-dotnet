@@ -92,7 +92,6 @@ namespace Microsoft.IdentityModel.Tokens.Tests
                 var securityTokenDescriptor = Default.AsymmetricSignSecurityTokenDescriptor(Default.SamlClaims);
                 securityTokenDescriptor.Claims = Default.PayloadDictionary;
 
-
                 SignatureProvider = CryptoProviderFactory.Default.CreateForVerifying(Default.AsymmetricSignTokenValidationParameters.IssuerSigningKey, KeyingMaterial.DefaultX509SigningCreds_2048_RsaSha2_Sha2.Algorithm);
                 return new TheoryData<RoundTripTokenTheoryData>()
                 {
